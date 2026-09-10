@@ -1,0 +1,12 @@
+# Maps a Loxone object name to the OBS meter-reading field name it should be
+# PUT under. Copy this file to field_mapping.yaml and edit it for your own
+# Loxone setup.
+
+fields:
+  Battery charge power: Battery-Charge-Power
+  Battery system power: Battery-Discharge-Power
+  Battery SOC: Battery-SOC
+  Grid Power: Grid-Power
+  Battery power: Battery-Power
+  House power: House-Power
+  Solar Power: Solar-Power

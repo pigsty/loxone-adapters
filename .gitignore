@@ -1,0 +1,13 @@
+# Personal instance configuration — real Loxone object names, meter
+# addresses, network topology, and API keys. Keep these local only.
+MAPPING.md
+*/.env
+*/config/field_mapping.yaml
+
+# Python
+__pycache__/
+*.pyc
+*/.venv/
+
+# OS
+.DS_Store

@@ -1,0 +1,48 @@
+services:
+  mbus-to-loxone:
+    build: ./mbus-to-loxone
+    image: loxone-adapters/mbus-to-loxone:latest
+    container_name: mbus-to-loxone
+    restart: unless-stopped
+    env_file:
+      - ./mbus-to-loxone/.env
+
+  loxone-events-to-influxdb:
+    build: ./loxone-events-to-influxdb
+    image: loxone-adapters/loxone-events-to-influxdb:latest
+    container_name: loxone-events-to-influxdb
+    restart: unless-stopped
+    env_file:
+      - ./loxone-events-to-influxdb/.env
+    ports:
+      - "5000:5000/udp"
+
+  loxone-events-to-emoncms:
+    build: ./loxone-events-to-emoncms
+    image: loxone-adapters/loxone-events-to-emoncms:latest
+    container_name: loxone-events-to-emoncms
+    restart: unless-stopped
+    env_file:
+      - ./loxone-events-to-emoncms/.env
+    volumes:
+      - ./loxone-events-to-emoncms/config/field_mapping.yaml:/app/config/field_mapping.yaml:ro
+    ports:
+      - "5001:5001/udp"
+
+  loxone-to-obs:
+    build: ./loxone-to-obs
+    image: loxone-adapters/loxone-to-obs:latest
+    container_name: loxone-to-obs
+    restart: unless-stopped
+    env_file:
+      - ./loxone-to-obs/.env
+    volumes:
+      - ./loxone-to-obs/config/field_mapping.yaml:/app/config/field_mapping.yaml:ro
+
+  obs-to-loxone:
+    build: ./obs-to-loxone
+    image: loxone-adapters/obs-to-loxone:latest
+    container_name: obs-to-loxone
+    restart: unless-stopped
+    env_file:
+      - ./obs-to-loxone/.env
