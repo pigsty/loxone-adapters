@@ -4,16 +4,32 @@ services:
     image: loxone-adapters/mbus-to-loxone:latest
     container_name: mbus-to-loxone
     restart: unless-stopped
-    env_file:
-      - ./mbus-to-loxone/.env
+    environment:
+      MBUS_PROXY_URL: ${MBUS_PROXY_URL}
+      LOXONE_BASE_URL: ${LOXONE_BASE_URL}
+      LOXONE_USERNAME: ${LOXONE_USERNAME}
+      LOXONE_PASSWORD: ${LOXONE_PASSWORD}
+      MAPPING_FILE: ${MAPPING_FILE:-/app/config/field_mapping.yaml}
+      POLL_INTERVAL_SECONDS: ${MBUS_POLL_INTERVAL_SECONDS:-300}
+      REQUEST_TIMEOUT_SECONDS: ${MBUS_REQUEST_TIMEOUT_SECONDS:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./mbus-to-loxone/config/field_mapping.yaml:/app/config/field_mapping.yaml:ro
 
   loxone-events-to-influxdb:
     build: ./loxone-events-to-influxdb
     image: loxone-adapters/loxone-events-to-influxdb:latest
     container_name: loxone-events-to-influxdb
     restart: unless-stopped
-    env_file:
-      - ./loxone-events-to-influxdb/.env
+    environment:
+      UDP_LISTEN_HOST: ${UDP_LISTEN_HOST:-0.0.0.0}
+      UDP_LISTEN_PORT: ${INFLUXDB_UDP_LISTEN_PORT:-5000}
+      INFLUXDB_HOST: ${INFLUXDB_HOST}
+      INFLUXDB_PORT: ${INFLUXDB_PORT:-8086}
+      INFLUXDB_DATABASE: ${INFLUXDB_DATABASE:-loxone}
+      INFLUXDB_USERNAME: ${INFLUXDB_USERNAME:-loxone}
+      INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     ports:
       - "5000:5000/udp"
 
@@ -22,8 +38,15 @@ services:
     image: loxone-adapters/loxone-events-to-emoncms:latest
     container_name: loxone-events-to-emoncms
     restart: unless-stopped
-    env_file:
-      - ./loxone-events-to-emoncms/.env
+    environment:
+      UDP_LISTEN_HOST: ${UDP_LISTEN_HOST:-0.0.0.0}
+      UDP_LISTEN_PORT: ${EMONCMS_UDP_LISTEN_PORT:-5001}
+      EMONCMS_BASE_URL: ${EMONCMS_BASE_URL:-https://emoncms.org/input/post}
+      EMONCMS_API_KEY: ${EMONCMS_API_KEY}
+      EMONCMS_NODE: ${EMONCMS_NODE:-emontx}
+      MAPPING_FILE: ${MAPPING_FILE:-/app/config/field_mapping.yaml}
+      REQUEST_TIMEOUT_SECONDS: ${EMONCMS_REQUEST_TIMEOUT_SECONDS:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
       - ./loxone-events-to-emoncms/config/field_mapping.yaml:/app/config/field_mapping.yaml:ro
     ports:
@@ -34,8 +57,17 @@ services:
     image: loxone-adapters/loxone-to-obs:latest
     container_name: loxone-to-obs
     restart: unless-stopped
-    env_file:
-      - ./loxone-to-obs/.env
+    environment:
+      LOXONE_BASE_URL: ${LOXONE_BASE_URL}
+      LOXONE_USERNAME: ${LOXONE_USERNAME}
+      LOXONE_PASSWORD: ${LOXONE_PASSWORD}
+      OBS_BASE_URL: ${OBS_BASE_URL}
+      OBS_API_KEY: ${OBS_API_KEY}
+      OBS_AUTH_HEADER: ${OBS_AUTH_HEADER:-}
+      MAPPING_FILE: ${MAPPING_FILE:-/app/config/field_mapping.yaml}
+      POLL_INTERVAL_SECONDS: ${LOXONE_TO_OBS_POLL_INTERVAL_SECONDS:-60}
+      REQUEST_TIMEOUT_SECONDS: ${LOXONE_TO_OBS_REQUEST_TIMEOUT_SECONDS:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
       - ./loxone-to-obs/config/field_mapping.yaml:/app/config/field_mapping.yaml:ro
 
@@ -44,5 +76,13 @@ services:
     image: loxone-adapters/obs-to-loxone:latest
     container_name: obs-to-loxone
     restart: unless-stopped
-    env_file:
-      - ./obs-to-loxone/.env
+    environment:
+      OBS_SCHEDULE_URL: ${OBS_SCHEDULE_URL}
+      LOXONE_BASE_URL: ${LOXONE_BASE_URL}
+      LOXONE_USERNAME: ${LOXONE_USERNAME}
+      LOXONE_PASSWORD: ${LOXONE_PASSWORD}
+      LOXONE_RATE_INPUT: ${LOXONE_RATE_INPUT:-VI34}
+      LOXONE_BATTERY_SOC_OUTPUT: ${LOXONE_BATTERY_SOC_OUTPUT:-Battery SOC}
+      POLL_INTERVAL_SECONDS: ${OBS_TO_LOXONE_POLL_INTERVAL_SECONDS:-60}
+      REQUEST_TIMEOUT_SECONDS: ${OBS_TO_LOXONE_REQUEST_TIMEOUT_SECONDS:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}

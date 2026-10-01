@@ -11,6 +11,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py .
+COPY config/field_mapping.example.yaml /app/config/field_mapping.yaml
 
 RUN chown -R app:app /app
 USER app

@@ -4,6 +4,7 @@ import time
 import xml.etree.ElementTree as ET
 
 import requests
+import yaml
 
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)-8s %(message)s")
 log = logging.getLogger("mbus-to-loxone")
@@ -14,12 +15,17 @@ LOXONE_USERNAME = os.environ["LOXONE_USERNAME"]
 LOXONE_PASSWORD = os.environ["LOXONE_PASSWORD"]
 POLL_INTERVAL_SECONDS = float(os.environ.get("POLL_INTERVAL_SECONDS", "300"))
 REQUEST_TIMEOUT_SECONDS = float(os.environ.get("REQUEST_TIMEOUT_SECONDS", "10"))
+MAPPING_FILE = os.environ.get("MAPPING_FILE", "config/field_mapping.yaml")
 
-RECORDS = [
-    (os.environ.get("FLOW_RECORD_ID", "4"), os.environ.get("FLOW_VI", "VI16"), "flow rate"),
-    (os.environ.get("FLOW_TEMP_RECORD_ID", "5"), os.environ.get("FLOW_TEMP_VI", "VI28"), "flow temperature"),
-    (os.environ.get("RETURN_TEMP_RECORD_ID", "6"), os.environ.get("RETURN_TEMP_VI", "VI27"), "return temperature"),
-]
+
+def load_mapping(path):
+    with open(path) as f:
+        raw = yaml.safe_load(f) or {}
+    return raw.get("fields", {})
+
+
+FIELDS = load_mapping(MAPPING_FILE)
+log.info("Loaded %d field mapping(s) from %s", len(FIELDS), MAPPING_FILE)
 
 
 def loxone_auth():
@@ -53,16 +59,16 @@ def run_cycle():
         log.exception("Failed to fetch M-Bus data from %s", MBUS_PROXY_URL)
         return
 
-    for record_id, virtual_input, description in RECORDS:
+    for record_id, virtual_input in FIELDS.items():
         value = records.get(record_id)
         if value is None:
-            log.warning("DataRecord id=%s (%s) not present in M-Bus response", record_id, description)
+            log.warning("DataRecord id=%s not present in M-Bus response", record_id)
             continue
         try:
             push_to_loxone(virtual_input, value)
-            log.info("Pushed %s (%s) = %s to Loxone %s", record_id, description, value, virtual_input)
+            log.info("Pushed DataRecord id=%s = %s to Loxone %s", record_id, value, virtual_input)
         except Exception:
-            log.exception("Failed to push %s (%s) = %s to Loxone %s", record_id, description, value, virtual_input)
+            log.exception("Failed to push DataRecord id=%s = %s to Loxone %s", record_id, value, virtual_input)
 
 
 def main():

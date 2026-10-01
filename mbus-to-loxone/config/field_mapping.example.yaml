@@ -1,0 +1,7 @@
+# Maps M-Bus DataRecord IDs to Loxone virtual inputs.
+# Copy this file to field_mapping.yaml and edit it for your meter and Miniserver.
+
+fields:
+  "4": VI16  # flow rate
+  "5": VI28  # flow temperature
+  "6": VI27  # return temperature
