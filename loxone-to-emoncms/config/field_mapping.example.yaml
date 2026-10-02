@@ -1,0 +1,23 @@
+# Maps an exact Loxone object name to the emoncms field name it should be
+# posted under. Only listed objects are polled.
+#
+# Copy this file to field_mapping.yaml and edit it for your own Loxone setup.
+
+fields:
+  # From udp_to_s3 - DISABLED FOR A WHILE?
+  #Heat Pump Output: heatpump_heat
+  #Total Heat Pump Consumption: heatpump_elec_total
+  #Heat Pump Power In: heatpump_elec
+  #Heat pump air in: heatpump_ambient
+  #Downstairs Temp: heatpump_room
+  #Heating Pump: heatpump_heating_mode
+
+  # Retained from the legacy polling scripts
+  I7: heatpump_dhw
+  Heat pump air in: outside_temp
+  Heat Pump Power In: heatpump_elec
+  VI16: heatpump_flowrate
+  VI28: heatpump_flow
+  VI27: heatpump_return
+  Downstairs Temp: downstairs_temp
+  Heating flow target: heatpump_flow_target

@@ -33,24 +33,24 @@ services:
     ports:
       - "5000:5000/udp"
 
-  loxone-events-to-emoncms:
-    build: ./loxone-events-to-emoncms
-    image: loxone-adapters/loxone-events-to-emoncms:latest
-    container_name: loxone-events-to-emoncms
+  loxone-to-emoncms:
+    build: ./loxone-to-emoncms
+    image: loxone-adapters/loxone-to-emoncms:latest
+    container_name: loxone-to-emoncms
     restart: unless-stopped
     environment:
-      UDP_LISTEN_HOST: ${UDP_LISTEN_HOST:-0.0.0.0}
-      UDP_LISTEN_PORT: ${EMONCMS_UDP_LISTEN_PORT:-5001}
+      LOXONE_BASE_URL: ${LOXONE_BASE_URL}
+      LOXONE_USERNAME: ${LOXONE_USERNAME}
+      LOXONE_PASSWORD: ${LOXONE_PASSWORD}
       EMONCMS_BASE_URL: ${EMONCMS_BASE_URL:-https://emoncms.org/input/post}
       EMONCMS_API_KEY: ${EMONCMS_API_KEY}
       EMONCMS_NODE: ${EMONCMS_NODE:-emontx}
       MAPPING_FILE: ${MAPPING_FILE:-/app/config/field_mapping.yaml}
+      POLL_INTERVAL_SECONDS: ${LOXONE_TO_EMONCMS_POLL_INTERVAL_SECONDS:-60}
       REQUEST_TIMEOUT_SECONDS: ${EMONCMS_REQUEST_TIMEOUT_SECONDS:-10}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
-      - ./loxone-events-to-emoncms/config/field_mapping.yaml:/app/config/field_mapping.yaml:ro
-    ports:
-      - "5001:5001/udp"
+      - ./loxone-to-emoncms/config/field_mapping.yaml:/app/config/field_mapping.yaml:ro
 
   loxone-to-obs:
     build: ./loxone-to-obs

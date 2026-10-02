@@ -19,12 +19,9 @@ Listens on a UDP port for Loxone's push-event stream (Loxone sends a
 message whenever a monitored object's value changes) and writes every
 event straight to InfluxDB, unfiltered.
 
-### loxone-events-to-emoncms
-Also listens on Loxone's UDP push-event stream, on its own separate UDP
-port, but only forwards a configured subset of objects to emoncms.org,
-under whatever field name your emoncms account expects. Because it reacts
-to Loxone's own change events rather than polling, it never sends stale
-data.
+### loxone-to-emoncms
+Polls a configured set of Loxone objects every minute and forwards their
+readings to emoncms.org under the field names expected by your account.
 
 ### loxone-to-obs
 Polls a configured set of Loxone objects (battery, grid, and solar
@@ -70,15 +67,13 @@ configure every container first.
 | --- | --- |
 | mbus-to-loxone | M-Bus meter → Loxone |
 | loxone-events-to-influxdb | Loxone events → InfluxDB |
-| loxone-events-to-emoncms | Loxone events → emoncms.org |
+| loxone-to-emoncms | Loxone → emoncms.org |
 | loxone-to-obs | Loxone → OBS |
 | obs-to-loxone | OBS schedule → Loxone |
 
 ## Loxone-side setup required
 
-The two UDP-listening adapters depend on the Loxone Miniserver being
-configured to push its events to them: add a UDP virtual output (or UDP
+The `loxone-events-to-influxdb` adapter depends on the Loxone Miniserver
+being configured to push events to it: add a UDP virtual output (or UDP
 monitor action) for each object you want forwarded, targeting this host on
-port `5000` for `loxone-events-to-influxdb` and port `5001` for
-`loxone-events-to-emoncms`, in the `timestamp;object name;value` format
-both containers parse.
+port `5000` in the `timestamp;object name;value` format it parses.
